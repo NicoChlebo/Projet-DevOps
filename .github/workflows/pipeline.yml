@@ -35,7 +35,12 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Tests et Couverture
-        run: npm run test:coverage
+        run: |
+          npm run test:coverage
+          echo "### Rapport de Couverture Jest" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          npx jest --coverage | grep -E "All files|% Stmts|% Branch" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
   # Stage 3: Sécurité
   security:
