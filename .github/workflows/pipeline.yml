@@ -81,18 +81,14 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Installation Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-      - name: Déploiement Heroku Staging
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku container:login
-          heroku container:push web -a ${{ vars.HEROKU_APP_STAGING }}
-          heroku container:release web -a ${{ vars.HEROKU_APP_STAGING }}
+      - name: Déclenchement du déploiement Render (Staging)
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
+
+      - name: Attente du déploiement
+        run: sleep 60 # On laisse un peu de temps à Render pour pull l'image et démarrer
+
       - name: Smoke test
-        run: curl -f https://${{ vars.HEROKU_APP_STAGING }}.herokuapp.com/health || exit 1
+        run: curl -f https://${{ vars.RENDER_APP_STAGING_URL }}/health || exit 1
 
   # Stage 6: Deploy Prod (Manuel sur main)
   deploy-prod:
@@ -100,15 +96,11 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Installation Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-      - name: Déploiement Heroku Production
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku container:login
-          heroku container:push web -a ${{ vars.HEROKU_APP_PROD }}
-          heroku container:release web -a ${{ vars.HEROKU_APP_PROD }}
+      - name: Déclenchement du déploiement Render (Production)
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PROD }}
+
+      - name: Attente du déploiement
+        run: sleep 60
+
       - name: Smoke test
-        run: curl -f https://${{ vars.HEROKU_APP_PROD }}.herokuapp.com/health || exit 1
+        run: curl -f https://${{ vars.RENDER_APP_PROD_URL }}/health || exit 1
