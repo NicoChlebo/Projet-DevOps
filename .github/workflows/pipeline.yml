@@ -53,6 +53,8 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
+      - name: Analyse statique du code (Linting)
+        run: npm run lint
       - name: Audit de sécurité (SAST basique)
         run: npm run audit
 
