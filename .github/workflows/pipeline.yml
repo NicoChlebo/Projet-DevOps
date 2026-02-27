@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: nicochlebo/projet-devops
 
 jobs:
   # Stage 1: Install & Cache
